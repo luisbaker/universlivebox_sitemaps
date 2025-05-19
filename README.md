@@ -1,93 +1,93 @@
-# Générateur de Sitemaps pour UniversLivebox
+# Sitemap Generator for UniversLivebox
 
-Ce script Node.js génère des sitemaps XML pour le site UniversLivebox, conformément aux spécifications de Google et Google News.
+This Node.js script generates XML sitemaps for the UniversLivebox website, complying with Google and Google News specifications.
 
-## Fonctionnalités
+## Features
 
-- Génération d'un sitemap standard (sitemap.xml)
-- Génération d'un sitemap Google News (sitemap-news.xml) avec prise en charge des auteurs
-- Génération d'un index de sitemap (sitemap-index.xml)
-- Exploration automatique des tags et catégories
-- Respect des normes XML et des spécifications Google
+- Standard sitemap generation (sitemap.xml)
+- Google News sitemap generation (sitemap-news.xml) with author support
+- Sitemap index generation (sitemap-index.xml)
+- Automatic exploration of tags and categories
+- Compliance with XML standards and Google specifications
 
-## Prérequis
+## Prerequisites
 
-- Node.js (version 12 ou supérieure)
-- npm (gestionnaire de paquets Node.js)
+- Node.js (version 12 or higher)
+- npm (Node.js package manager)
 
 ## Installation
 
-1. Clonez ce dépôt:
+1. Clone this repository:
 ```bash
 git clone https://github.com/luisbaker/universlivebox_sitemaps.git
 cd universlivebox_sitemaps
 ```
 
-2. Installez les dépendances requises:
+2. Install the required dependencies:
 ```bash
 npm install
 ```
 
-## Utilisation
+## Usage
 
-### Génération manuelle des sitemaps
+### Manual Sitemap Generation
 
-Exécutez le script avec la commande:
+Run the script with the command:
 
 ```bash
 npm run start:dynamic
 ```
 
-Les fichiers seront générés dans le dossier `./sitemaps/`.
+The files will be generated in the `./sitemaps/` folder.
 
-### Fichiers générés
+### Generated Files
 
-- `sitemap.xml`: Sitemap standard avec toutes les pages du site
-- `sitemap-news.xml`: Sitemap Google News avec les articles récents
-- `sitemap-index.xml`: Index qui référence tous les sitemaps
-- `sitemap-tag-xxxx.xml`: Sitemaps par tag (si suffisamment d'articles)
-- `robots.txt`: Avec référence au sitemap-index
+- `sitemap.xml`: Standard sitemap with all website pages
+- `sitemap-news.xml`: Google News sitemap with recent articles
+- `sitemap-index.xml`: Index referencing all sitemaps
+- `sitemap-tag-xxxx.xml`: Tag-specific sitemaps (if enough articles)
+- `robots.txt`: With reference to the sitemap-index
 
-Si le nombre d'articles dépasse les limites de Google, les fichiers seront automatiquement divisés (ex: `sitemap1.xml`, `sitemap2.xml`, etc.).
+If the number of articles exceeds Google's limits, the files will be automatically split (e.g., `sitemap1.xml`, `sitemap2.xml`, etc.).
 
-## Automatisation
+## Automation
 
-### Option 1: Tâche CRON sur le serveur
+### Option 1: CRON Job on Server
 
-Pour exécuter le script automatiquement toutes les heures (recommandé pour un site d'actualités):
+To run the script automatically every hour (recommended for a news website):
 
-1. Connectez-vous à votre serveur via SSH
-2. Ouvrez l'éditeur crontab:
+1. Connect to your server via SSH
+2. Open the crontab editor:
 ```bash
 crontab -e
 ```
 
-3. Ajoutez la ligne suivante:
+3. Add the following line:
 ```
-0 * * * * cd /chemin/vers/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
+0 * * * * cd /path/to/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
 ```
 
-Cette configuration exécutera le script à chaque heure pile. Pour réduire la charge serveur pendant les heures de pointe, vous pouvez configurer une exécution à des intervalles différents:
+This configuration will run the script at the top of every hour. To reduce server load during peak hours, you can configure execution at different intervals:
 
 ```
-# Exécution toutes les heures pendant la journée (6h-23h)
-0 6-23 * * * cd /chemin/vers/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
+# Run every hour during the day (6am-11pm)
+0 6-23 * * * cd /path/to/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
 
-# Exécution toutes les 3 heures pendant la nuit (minuit-5h)
-0 0,3 * * * cd /chemin/vers/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
+# Run every 3 hours during the night (midnight-5am)
+0 0,3 * * * cd /path/to/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
 ```
 
 ### Option 2: GitHub Actions
 
-Pour automatiser avec GitHub Actions et une exécution horaire, créez un fichier `.github/workflows/generate-sitemaps.yml`:
+To automate with GitHub Actions and run hourly, create a `.github/workflows/generate-sitemaps.yml` file:
 
 ```yaml
 name: Generate Sitemaps
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Toutes les heures
-  workflow_dispatch:      # Permet de lancer manuellement
+    - cron: '0 * * * *'  # Every hour
+  workflow_dispatch:      # Allows manual triggering
 
 jobs:
   build:
@@ -115,76 +115,76 @@ jobs:
           git push
 ```
 
-### Option 3: Script de déploiement automatique
+### Option 3: Automatic Deployment Script
 
-Créez un script `deploy.sh` qui peut être exécuté via une tâche CRON toutes les heures:
+Create a `deploy.sh` script that can be executed via a CRON job every hour:
 
 ```bash
 #!/bin/bash
 
-# Générer les sitemaps
+# Generate sitemaps
 node sitemap-generator-dynamic.js
 
-# Déployer vers le serveur web
-scp -r sitemaps/* utilisateur@serveur:/chemin/vers/www/
+# Deploy to web server
+scp -r sitemaps/* user@server:/path/to/www/
 
-# Log l'exécution
-echo "Sitemaps générés et déployés le $(date)" >> deploy.log
+# Log execution
+echo "Sitemaps generated and deployed on $(date)" >> deploy.log
 ```
 
-Rendez-le exécutable:
+Make it executable:
 ```bash
 chmod +x deploy.sh
 ```
 
-Puis configurez une tâche CRON pour l'exécuter toutes les heures:
+Then configure a CRON job to run it every hour:
 ```
-0 * * * * cd /chemin/vers/universlivebox_sitemaps && ./deploy.sh
+0 * * * * cd /path/to/universlivebox_sitemaps && ./deploy.sh
 ```
 
 ## Configuration
 
-Vous pouvez modifier les paramètres dans les fichiers:
+You can modify parameters in the files:
 
-- `sitemap-generator-dynamic.js`: Configuration principale
-- `crawler.js`: Configuration du crawler
+- `sitemap-generator-dynamic.js`: Main configuration
+- `crawler.js`: Crawler configuration
 
-Paramètres importants dans `sitemap-generator-dynamic.js`:
+Important parameters in `sitemap-generator-dynamic.js`:
 ```javascript
 const CONFIG = {
   nomSite: 'UniversLivebox',
   domaine: 'https://universlivebox.com',
-  // ... autres paramètres
+  // ... other parameters
 };
 ```
 
 ## Contribution
 
-Les contributions sont les bienvenues! N'hésitez pas à ouvrir une issue ou une pull request.
+Contributions are welcome! Feel free to open an issue or a pull request.
 
-## Structure des fichiers
+## Structure of Files
 
-- `sitemap-generator.js`: Génère des sitemaps à partir de données statiques
-- `crawler.js`: Module pour crawler le site et extraire les articles
-- `sitemap-generator-dynamic.js`: Génère des sitemaps à partir des données du crawler
-- `package.json`: Configuration du projet et dépendances
+- `sitemap-generator.js`: Generates sitemaps from static data
+- `crawler.js`: Module for crawling the site and extracting articles
+- `sitemap-generator-dynamic.js`: Generates sitemaps from crawler data
+- `package.json`: Project configuration and dependencies
 
-## Intégration avec votre site
+## Integration with Your Site
 
-Pour une utilisation en production, il est recommandé:
+For production use, it is recommended:
 
-1. D'adapter les sélecteurs CSS dans `crawler.js` à la structure de votre site
-2. D'exécuter le script via une tâche planifiée (cron job)
-3. De soumettre l'URL de votre index sitemap à Google Search Console
+1. To adapt CSS selectors in `crawler.js` to the structure of your site
+2. To run the script via a scheduled task (cron job)
+3. To submit your sitemap index URL to Google Search Console
 
-## Dépendances
+## Dependencies
 
-- `fs`, `path`: Modules Node.js pour la gestion des fichiers
-- `xml2js`: Module pour la génération de XML
-- `axios`: Client HTTP pour les requêtes web
-- `cheerio`: Parser HTML pour extraire les données des pages web
+- `fs`, `path`: Node.js modules for file management
+- `xml2js`: Module for generating XML
+- `axios`: HTTP client for web requests
+- `cheerio`: HTML parser for extracting data from web pages
 
-## Notes importantes
+## Important Notes
 
-- Pour Google News, seuls les articles des 48 dernières heures sont inclus, conformément aux exigences de Google
-- Respectez l'étiquette de crawling en configurant des délais raisonnables entre les requêtes 
+- For Google News, only articles from the last 48 hours are included, as per Google's requirements
+- Respect crawling etiquette by configuring reasonable delays between requests 
