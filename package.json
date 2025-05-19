@@ -1,0 +1,29 @@
+{
+  "name": "universlivebox-sitemap-generator",
+  "version": "1.0.0",
+  "description": "Générateur de sitemaps pour UniversLivebox.com",
+  "main": "sitemap-generator.js",
+  "scripts": {
+    "start": "node sitemap-generator.js",
+    "start:dynamic": "node sitemap-generator-dynamic.js",
+    "crawl": "node crawler.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sitemap",
+    "google",
+    "news",
+    "xml",
+    "seo"
+  ],
+  "author": "UniversLivebox",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0-rc.12",
+    "xml2js": "^0.6.2"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  }
+} 
