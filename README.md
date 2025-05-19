@@ -54,7 +54,7 @@ Si le nombre d'articles dépasse les limites de Google, les fichiers seront auto
 
 ### Option 1: Tâche CRON sur le serveur
 
-Pour exécuter le script automatiquement tous les jours à 4h du matin:
+Pour exécuter le script automatiquement toutes les heures (recommandé pour un site d'actualités):
 
 1. Connectez-vous à votre serveur via SSH
 2. Ouvrez l'éditeur crontab:
@@ -64,19 +64,29 @@ crontab -e
 
 3. Ajoutez la ligne suivante:
 ```
-0 4 * * * cd /chemin/vers/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
+0 * * * * cd /chemin/vers/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
+```
+
+Cette configuration exécutera le script à chaque heure pile. Pour réduire la charge serveur pendant les heures de pointe, vous pouvez configurer une exécution à des intervalles différents:
+
+```
+# Exécution toutes les heures pendant la journée (6h-23h)
+0 6-23 * * * cd /chemin/vers/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
+
+# Exécution toutes les 3 heures pendant la nuit (minuit-5h)
+0 0,3 * * * cd /chemin/vers/universlivebox_sitemaps && /usr/bin/node sitemap-generator-dynamic.js
 ```
 
 ### Option 2: GitHub Actions
 
-Pour automatiser avec GitHub Actions, créez un fichier `.github/workflows/generate-sitemaps.yml`:
+Pour automatiser avec GitHub Actions et une exécution horaire, créez un fichier `.github/workflows/generate-sitemaps.yml`:
 
 ```yaml
 name: Generate Sitemaps
 
 on:
   schedule:
-    - cron: '0 4 * * *'  # Tous les jours à 4h du matin
+    - cron: '0 * * * *'  # Toutes les heures
   workflow_dispatch:      # Permet de lancer manuellement
 
 jobs:
@@ -107,21 +117,29 @@ jobs:
 
 ### Option 3: Script de déploiement automatique
 
-Créez un script `deploy.sh` pour générer et déployer les sitemaps:
+Créez un script `deploy.sh` qui peut être exécuté via une tâche CRON toutes les heures:
 
 ```bash
 #!/bin/bash
 
-# Génerer les sitemaps
+# Générer les sitemaps
 node sitemap-generator-dynamic.js
 
 # Déployer vers le serveur web
 scp -r sitemaps/* utilisateur@serveur:/chemin/vers/www/
+
+# Log l'exécution
+echo "Sitemaps générés et déployés le $(date)" >> deploy.log
 ```
 
 Rendez-le exécutable:
 ```bash
 chmod +x deploy.sh
+```
+
+Puis configurez une tâche CRON pour l'exécuter toutes les heures:
+```
+0 * * * * cd /chemin/vers/universlivebox_sitemaps && ./deploy.sh
 ```
 
 ## Configuration
